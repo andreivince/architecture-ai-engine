@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import rhinoscriptsyntax as rs
 import math
 import Rhino # For RhinoCommon
@@ -75,7 +76,7 @@ def generate_house(params):
 
     if not initial_walls_obj_guid: print("FATAL ERROR: Initial walls GUID missing after shell."); rs.EnableRedraw(True); return
     else:
-        print(f"DEBUG 1: Initial walls created. GUID: {initial_walls_obj_guid}, IsBrep: {rs.IsBrep(initial_walls_obj_guid)}")
+        print("DEBUG 1: Initial walls created. GUID: {initial_walls_obj_guid}, IsBrep: {rs.IsBrep(initial_walls_obj_guid)}")
         if not rs.IsBrep(initial_walls_obj_guid):
             print("ERROR: initial_walls_obj_guid is NOT a valid Brep after creation!"); rs.DeleteObject(initial_walls_obj_guid); rs.EnableRedraw(True); return
 
@@ -85,7 +86,7 @@ def generate_house(params):
         s_pt2 = (width - wall_thickness, depth - wall_thickness, (i_floor + 1) * floor_height)
         slab_guid = create_box_rhinocommon(s_pt1, s_pt2)
         if slab_guid and rs.IsBrep(slab_guid): intermediate_slabs_guids.append(slab_guid)
-        else: print(f"Warning: Failed to create slab for floor {i_floor + 1}.")
+        else: print("Warning: Failed to create slab for floor {i_floor + 1}.")
 
     processed_walls_obj_guid = initial_walls_obj_guid # Start with the shell
     if intermediate_slabs_guids:
@@ -122,7 +123,7 @@ def generate_house(params):
             rs.DeleteObjects(intermediate_slabs_guids)
             # processed_walls_obj_guid remains initial_walls_obj_guid
 
-    print(f"DEBUG 2: After slab union. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
+    print("DEBUG 2: After slab union. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
     if not processed_walls_obj_guid or not rs.IsBrep(processed_walls_obj_guid):
         print("ERROR: processed_walls_obj_guid invalid before applying cutters!"); rs.DeleteObject(processed_walls_obj_guid); rs.EnableRedraw(True); return
 
@@ -174,10 +175,10 @@ def generate_house(params):
             if strip_h < 0.2: continue
             win_cut_guid = create_box_rhinocommon((strip_x, -0.01, strip_sill_abs_z), (strip_x + strip_w, wall_thickness + 0.01, strip_sill_abs_z + strip_h))
             if win_cut_guid: all_cutter_guids.append(win_cut_guid)
-            else: print(f"Warning: Failed strip win cut flr {i_floor}")
+            else: print("Warning: Failed strip win cut flr {i_floor}")
             win_pane_guid = create_box_rhinocommon((strip_x, wall_thickness * 0.4, strip_sill_abs_z), (strip_x + strip_w, wall_thickness * 0.6, strip_sill_abs_z + strip_h))
             if win_pane_guid: rs.ObjectColor(win_pane_guid, color_windows); final_geometry_guids.append(win_pane_guid)
-            else: print(f"Warning: Failed strip win pane flr {i_floor}")
+            else: print("Warning: Failed strip win pane flr {i_floor}")
         else: 
             num_side_windows = 1 if width < (2 * win_actual_w + 3 * wall_thickness) else 2
             win_spacing = max((width - (num_side_windows * win_actual_w) - (2 * wall_thickness)) / (num_side_windows + 1), wall_thickness * 0.5)
@@ -251,35 +252,35 @@ def generate_house(params):
                     if not win_cut_guid: win_cut_guid = create_box_rhinocommon((win_x, -0.01, win_sill_abs_z), (win_x + win_actual_w, wall_thickness + 0.01, win_sill_abs_z + win_actual_h))
                     if not win_pane_guid: win_pane_guid = create_box_rhinocommon((win_x, wall_thickness * 0.4, win_sill_abs_z), (win_x + win_actual_w, wall_thickness * 0.6, win_sill_abs_z + win_actual_h))
                 if win_cut_guid and rs.IsBrep(win_cut_guid): all_cutter_guids.append(win_cut_guid)
-                else: print(f"Warning: Failed win cut flr {i_floor} win {k_win}"); rs.DeleteObject(win_cut_guid)
+                else: print("Warning: Failed win cut flr {i_floor} win {k_win}"); rs.DeleteObject(win_cut_guid)
                 if win_pane_guid and rs.IsBrep(win_pane_guid): rs.ObjectColor(win_pane_guid, color_windows); final_geometry_guids.append(win_pane_guid)
-                else: print(f"Warning: Failed win pane flr {i_floor} win {k_win}"); rs.DeleteObject(win_pane_guid)
+                else: print("Warning: Failed win pane flr {i_floor} win {k_win}"); rs.DeleteObject(win_pane_guid)
 
-    print(f"DEBUG 3: Before wall cuts. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}, Num cutters: {len(all_cutter_guids)}")
+    print("DEBUG 3: Before wall cuts. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}, Num cutters: {len(all_cutter_guids)}")
     if processed_walls_obj_guid and rs.IsBrep(processed_walls_obj_guid) and all_cutter_guids:
         valid_cutter_guids = [c for c in all_cutter_guids if c and rs.IsBrep(c)]
         if valid_cutter_guids:
             current_wall_guid = processed_walls_obj_guid
-            print(f"DEBUG: Starting wall cuts. Initial current_wall_guid: {current_wall_guid}, IsBrep: {rs.IsBrep(current_wall_guid)}")
+            print("DEBUG: Starting wall cuts. Initial current_wall_guid: {current_wall_guid}, IsBrep: {rs.IsBrep(current_wall_guid)}")
             for i, cutter_guid in enumerate(valid_cutter_guids):
-                print(f"DEBUG: Attempting cut {i+1} with cutter: {cutter_guid}, IsBrep: {rs.IsBrep(cutter_guid)}")
-                if not current_wall_guid or not rs.IsBrep(current_wall_guid): print(f"ERROR: current_wall_guid ({current_wall_guid}) invalid before cut {i+1}. Aborting."); break
+                print("DEBUG: Attempting cut {i+1} with cutter: {cutter_guid}, IsBrep: {rs.IsBrep(cutter_guid)}")
+                if not current_wall_guid or not rs.IsBrep(current_wall_guid): print("ERROR: current_wall_guid ({current_wall_guid}) invalid before cut {i+1}. Aborting."); break
                 temp_diff_guids = rs.BooleanDifference([current_wall_guid], [cutter_guid], delete_input=False)
                 if temp_diff_guids and len(temp_diff_guids) == 1 and rs.IsBrep(temp_diff_guids[0]):
                     new_wall_cand = temp_diff_guids[0]
                     if current_wall_guid != processed_walls_obj_guid and current_wall_guid != new_wall_cand:
                         if rs.IsObject(current_wall_guid): rs.DeleteObject(current_wall_guid)
                     current_wall_guid = new_wall_cand
-                    print(f"DEBUG: Cut {i+1} successful. New current_wall_guid: {current_wall_guid}")
-                else: rs.DeleteObjects(temp_diff_guids); print(f"Warning: Wall cut {i+1} failed. current_wall_guid ({current_wall_guid}) unchanged.")
+                    print("DEBUG: Cut {i+1} successful. New current_wall_guid: {current_wall_guid}")
+                else: rs.DeleteObjects(temp_diff_guids); print("Warning: Wall cut {i+1} failed. current_wall_guid ({current_wall_guid}) unchanged.")
             if current_wall_guid != processed_walls_obj_guid:
                 if rs.IsObject(processed_walls_obj_guid): rs.DeleteObject(processed_walls_obj_guid)
             processed_walls_obj_guid = current_wall_guid
-            print(f"DEBUG: After all wall cuts. Final processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
+            print("DEBUG: After all wall cuts. Final processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
         rs.DeleteObjects(all_cutter_guids)
-    else: print(f"DEBUG: Skipping wall cuts. Conditions not met. walls: {processed_walls_obj_guid}, cutters: {len(all_cutter_guids)}")
+    else: print("DEBUG: Skipping wall cuts. Conditions not met. walls: {processed_walls_obj_guid}, cutters: {len(all_cutter_guids)}")
 
-    print(f"DEBUG 4: After wall cuts, before balcony. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
+    print("DEBUG 4: After wall cuts, before balcony. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
     if num_floors >= 2 and has_balcony:
         b_flr_idx = 1; b_base_z = b_flr_idx * floor_height; b_w = width*0.5; b_d = max(1.2, depth*0.20)
         b_x = (width-b_w)/2.0; b_slab_h = wall_thickness*0.8
@@ -306,41 +307,40 @@ def generate_house(params):
                 if bd_panel_guid: rs.ObjectColor(bd_panel_guid,color_door); final_geometry_guids.append(bd_panel_guid)
         else: print("Warning: Failed balcony slab.")
     
-    print(f"DEBUG 5: After balcony, before roof. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
+    print("DEBUG 5: After balcony, before roof. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
     roof_place_z = num_floors*floor_height; roof_obj_guid=None
     if roof_type=="flat": roof_obj_guid=create_box_rhinocommon((0,0,roof_place_z),(width,depth,roof_place_z+wall_thickness))
     elif roof_type=="gable" or roof_type=="asymmetric":
         ridge_h=width/3.5; ridge_x=width/2.0 if roof_type=="gable" else width*0.33
-        prof_pts=[Rhino.Geometry.Point3d(0,0,0),Rhino.Geometry.Point3d(width,0,0),Rhino.Geometry.Point3d(ridge_x,ridge_h,0),Rhino.Geometry.Point3d(0,0,0)]
+        prof_pts=[Rhino.Geometry.Point3d(0,0,0),Rhino.Geometry.Point3d(width,0,0),Rhino.Geometry.Point3d(ridge_x,0,ridge_h),Rhino.Geometry.Point3d(0,0,0)]
         prof_c=rs.AddPolyline(prof_pts)
         if prof_c and rs.IsCurveClosed(prof_c):
             srf_l=rs.AddPlanarSrf(prof_c)
             if srf_l and len(srf_l)>0:
-                path_l=rs.AddLine(Rhino.Geometry.Point3d(0,0,0),Rhino.Geometry.Point3d(0,0,depth))
-                prism_guid=rs.ExtrudeSurface(srf_l[0],path_l)
-                roof_id = rs.ExtrudeSurface(srf, path)          # <-- already in your code
+                path_l=rs.AddLine(Rhino.Geometry.Point3d(0,0,0),Rhino.Geometry.Point3d(0,depth,0))
+                prism_guid=rs.ExtrudeSurface(srf_l[0],path_l)       
                 rs.DeleteObject(path_l); rs.DeleteObjects(srf_l)
-                capped = rs.CapPlanarHoles(roof_id)
-                if capped and len(capped) == 1:
-                    rs.DeleteObject(roof_id)
-                    roof_id = capped[0]
-                else:
-                    print("Cap failed – roof will stay an open surface")
                 if prism_guid and rs.IsBrep(prism_guid):
-                    bb_p=rs.BoundingBox(prism_guid)
-                    c_rot=rs.PointDivide(rs.PointAdd(bb_p[0],bb_p[6]),2.0) if bb_p else Rhino.Geometry.Point3d(width/2.0,0,depth/2.0)
-                    curr_bb_rot=rs.BoundingBox(prism_guid)
-                    if curr_bb_rot:
-                        min_z_rot=curr_bb_rot[0].Z; move_v=Rhino.Geometry.Vector3d(0,0,roof_place_z-min_z_rot)
-                        rs.MoveObject(prism_guid,move_v); roof_obj_guid=prism_guid
-                    else: rs.DeleteObject(prism_guid); print("Warning: Gable roof prism invalid after rotate/move.")
-                else: rs.DeleteObject(prism_guid); print("Warning: Failed to extrude gable roof or not Brep.")
+                    capped = rs.CapPlanarHoles(prism_guid)
+                    if capped and len(capped) == 1:
+                        rs.DeleteObject(prism_guid)
+                        prism_guid = capped[0]
+                    else:
+                        print("Cap failed – roof will stay an open surface")
+                
+                    roof_base_z = rs.BoundingBox(prism_guid)[0].Z
+                    move_vector = Rhino.Geometry.Vector3d(0, 0, roof_place_z - roof_base_z)
+                    rs.MoveObject(prism_guid, move_vector)
+                    roof_obj_guid = prism_guid
+                else:
+                    rs.DeleteObject(prism_guid)
+                    print("Warning: Failed to extrude gable roof or not Brep.")
             else: rs.DeleteObjects(srf_l); print("Warning: Failed planar srf for gable.")
             rs.DeleteObject(prof_c)
         elif prof_c: rs.DeleteObject(prof_c); print("Warning: Gable roof profile not closed.")
         else: print("Warning: Failed gable roof profile curve.")
     if roof_obj_guid and rs.IsBrep(roof_obj_guid): rs.ObjectColor(roof_obj_guid,color_roof); final_geometry_guids.append(roof_obj_guid)
-    else: print(f"Warning: Roof gen failed for '{roof_type}'. Final roof_guid: {roof_obj_guid}"); rs.DeleteObject(roof_obj_guid)
+    else: print("Warning: Roof gen failed for '{roof_type}'. Final roof_guid: {roof_obj_guid}"); rs.DeleteObject(roof_obj_guid)
     # Capture the footprint box of the finished walls
     house_bb = rs.BoundingBox(processed_walls_obj_guid)
     # Capture the footprint box of the roof we just created
@@ -360,7 +360,7 @@ def generate_house(params):
         if delta.Length > Rhino.RhinoMath.ZeroTolerance * 10:
             rs.MoveObject(roof_obj_guid, delta)
 
-        print(f"DEBUG 6: Finalizing walls. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
+        print("DEBUG 6: Finalizing walls. processed_walls_obj_guid: {processed_walls_obj_guid}, IsBrep: {rs.IsBrep(processed_walls_obj_guid)}")
         if processed_walls_obj_guid and rs.IsBrep(processed_walls_obj_guid):
             rs.ObjectColor(processed_walls_obj_guid,color_walls); final_geometry_guids.append(processed_walls_obj_guid)
         elif rs.IsObject(processed_walls_obj_guid): rs.DeleteObject(processed_walls_obj_guid); print("Error: Final wall obj GUID existed but not valid Brep.")
@@ -372,14 +372,14 @@ def generate_house(params):
 params = {
     "width": 15,
     "depth": 18,
-    "floors": 3,
-    "roof_type": "flat",
+    "floors": 4,
+    "roof_type": "gable",
     "window_style": "square",
-    "door_position": "center",
-    "has_balcony": False
+    "door_position": "left",
+    "has_balcony": True
 }
 
 if __name__ == '__main__':
     generated_objects = generate_house(params)
-    if generated_objects: print(f"House gen complete. {len(generated_objects)} final GUIDs.")
+    if generated_objects: print("House gen complete. {len(generated_objects)} final GUIDs.")
     else: print("House gen failed or produced no objects.")
