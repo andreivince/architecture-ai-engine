@@ -372,7 +372,7 @@ def generate_house(params):
 params = {
     "width": 15,
     "depth": 18,
-    "floors": 4,
+    "floors": 3,
     "roof_type": "gable",
     "window_style": "square",
     "door_position": "left",

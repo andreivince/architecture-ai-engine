@@ -148,7 +148,7 @@ params = {
     'width': 20,
     'depth': 20,
     'base_height': 120,
-    'tiers': 4,
+    'tiers': 5,
     'tier_step': 0.7,
     'windows_per_face': 3,
     'has_spire': True
