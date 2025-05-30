@@ -18,6 +18,6 @@ origin = [0, 0, 0]
 initial_direction = [0, 1, 0]  
 initial_length = 10
 branch_angle = 35  
-max_depth = 8
+max_depth = 10
 
 draw_branch(origin, initial_direction, initial_length, branch_angle, max_depth)
