@@ -27,6 +27,7 @@
 ![Tower Sample](images/Tower%20Sample%20Week%202.png)
 
 # **Aidan** for Week 2
+<<<<<<< HEAD
 
 - Implemented a recursive Python script (`branchingTree.py`) in Rhino to generate a branching tree structure
 - Used `rhinoscriptsyntax` to construct bifurcating branches using vector rotation and scaling
@@ -56,3 +57,5 @@ def draw_branch(start_point, direction, length, angle, depth):
     draw_branch(end_point, vec2, length * 0.7, angle, depth - 1)
 
 
+=======
+>>>>>>> ff7b1e69a90fcfeeee82417789ed9da2f68afbba
