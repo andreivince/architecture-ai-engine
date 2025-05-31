@@ -24,7 +24,6 @@
 2D_CA_tower, tapered form, b=3, s=2–5, 30 layers
 
 ### Example Visual
-```markdown
 ![Tower Sample](images/Tower%20Sample%20Week%202.png)
 
 # **Aidan** for Week 2
