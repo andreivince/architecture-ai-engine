@@ -99,7 +99,7 @@ def draw_branch(start_point, direction, length, angle, depth):
 - Later: explore model fine-tuning or retrieval-based LLM prompting for consistent generative descriptions
 
 
-![Sample of 100 Variations](images/variations100.png)
+![Sample of 100 Variations](images/100variations.png)
 
 ---
 
