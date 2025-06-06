@@ -27,3 +27,35 @@
 ![Tower Sample](images/Tower%20Sample%20Week%202.png)
 
 # **Aidan** for Week 2
+<<<<<<< HEAD
+
+- Implemented a recursive Python script (`branchingTree.py`) in Rhino to generate a branching tree structure
+- Used `rhinoscriptsyntax` to construct bifurcating branches using vector rotation and scaling
+- Introduced parameters for angle, depth, and scaling ratio to control the fractal-like tree generation
+- Explored variations in recursion depth to visualize structural complexity
+
+### Example Visual
+![Sample 1](images/branch1.png)
+![Sample 2](images/branch2.png)
+![Sample 3](images/branch3.png)
+
+### Example Script Snippet
+
+
+```python
+def draw_branch(start_point, direction, length, angle, depth):
+    if depth == 0:
+        return
+
+    end_point = rs.PointAdd(start_point, rs.VectorScale(direction, length))
+    rs.AddLine(start_point, end_point)
+
+    vec1 = rs.VectorRotate(direction, angle, [0, 0, 1])
+    vec2 = rs.VectorRotate(direction, -angle, [0, 0, 1])
+
+    draw_branch(end_point, vec1, length * 0.7, angle, depth - 1)
+    draw_branch(end_point, vec2, length * 0.7, angle, depth - 1)
+
+
+=======
+>>>>>>> ff7b1e69a90fcfeeee82417789ed9da2f68afbba
