@@ -59,3 +59,49 @@ def draw_branch(start_point, direction, length, angle, depth):
 
 =======
 >>>>>>> ff7b1e69a90fcfeeee82417789ed9da2f68afbba
+```
+
+# **Andrei Vince – Week 3 Update**
+
+### ✅ Summary of Progress
+
+- Introduced **deterministic seed locking per index** (`random.seed(42 + idx)`) to ensure reproducibility across runs.
+  - ATTENTION: If you want full randomness again, you should **comment out the seed line** in the script.
+- Preserved rule-based **shape classification** (e.g., "tapered", "dense"), though it now plays a **secondary role** in the pipeline.
+- Automated **image capture** of each generated tower outputs are saved with consistent naming for future prompt alignment.
+- Injected **manually curated prompts** for the first 10 towers to bootstrap prompt-to-form mapping.
+
+---
+
+### 🧠 Prompt Classification Logic
+
+| Rule                                               | Label        |
+| -------------------------------------------------- | ------------ |
+| `survive_min ≤ 2` and `survive_max ≥ 6`            | fragmented   |
+| `layers ≥ 25` and `birth ≥ 3`                      | tapered      |
+| `voxel_count ≥ 380`                                | dense        |
+| `layers ≥ 20` and `voxel_count < 300`              | eroded       |
+| *(otherwise)*                                      | mixed        |
+
+---
+
+### ⚠️ Challenges Faced
+
+- Rhino’s rendering camera had to be re-centered manually per tower to get usable screenshots
+- Workaround using `rs.Command("-_ViewCaptureToFile")` was used for Camera
+
+---
+
+### 🚀 Next Steps
+
+- Build an **external file** to store structured metadata (index, CA params, visual traits, manual prompt)
+- Begin **prompt generalization** phase use GPT-based embedding comparison to expand curated prompts to remaining 90 towers
+- Later: explore model fine-tuning or retrieval-based LLM prompting for consistent generative descriptions
+
+
+![Sample of 100 Variations](images/100variations.png)
+
+---
+
+
+
