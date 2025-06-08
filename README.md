@@ -103,5 +103,44 @@ def draw_branch(start_point, direction, length, angle, depth):
 
 ---
 
+# **Aidan – Week 3 Update**
+
+### ✅ Summary of Progress
+
+- Built a new voxelized branching tree generator (`branchingTree_New.py`) to simulate multiple growing trees using 3D grid logic.
+- Implemented a recursive growth algorithm that respects voxel collisions and gradually tapers branch sizes.
+- Added randomness in branching directions and positions to create organic variation across structures.
+- Explored tree clustering effects through randomized tree origins within a voxel grid.
+- Limited maximum recursion depth and grid bounds to control performance and visual clarity.
+
+---
+
+### 🌲 Core Script Behavior
+
+- Each tree grows recursively with downward-biased branches.
+- New branches emerge probabilistically based on depth.
+- Voxel grid prevents overlapping cubes and enables natural spacing.
+- Tapering function scales branch thickness as depth increases.
+
+### 🔧 Key Parameters
+
+| Parameter         | Description                             |
+|------------------|-----------------------------------------|
+| `voxel_size`      | Size of each cube voxel                 |
+| `grid_limit`      | Width of 3D grid space                  |
+| `max_recursion`   | Controls tree depth / height            |
+| `taper_amount`    | How much thinner branches become        |
+| `number_of_trees` | How many separate trees to generate     |
+
+---
+
+### 🖼️ Visual Examples
+
+| Perspective 1 | Top View |
+|---------------|----------|
+| ![Voxel Trees 1](images/voxelized_trees1.png) | ![Voxel Trees 2](images/voxelized_trees2.png) |
+
+---
+
 
 
