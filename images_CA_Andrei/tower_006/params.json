@@ -1,0 +1,9 @@
+{
+  "id": "tower_006",
+  "birth": 3,
+  "survive_min": 2,
+  "survive_max": 6,
+  "layers": 26,
+  "voxels": 400,
+  "shape": "fragmented"
+}

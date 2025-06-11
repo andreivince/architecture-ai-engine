@@ -1,0 +1,9 @@
+{
+  "id": "tower_015",
+  "birth": 2,
+  "survive_min": 3,
+  "survive_max": 6,
+  "layers": 26,
+  "voxels": 400,
+  "shape": "dense"
+}
