@@ -1,14 +1,29 @@
 import os
 import base64
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# === CONFIGURATION ===
+# Set this to "glass" or "material" before running each batch
+focus_mode = "material"  # or "material"
+
+# Load API key
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
-image_folder = "images_realism"
-output_folder = "descriptions"
+# Set folders based on focus_mode
+if focus_mode == "glass":
+    image_folder = "glass_images_realism"
+    output_folder = "glass_focus_descriptions"
+    output_json_name = "glass_focus_params.json"
+elif focus_mode == "material":
+    image_folder = "material_images_realism"
+    output_folder = "material_focus_descriptions"
+    output_json_name = "material_focus_params.json"
+else:
+    raise ValueError(f"Unknown focus_mode: {focus_mode}")
 
 os.makedirs(output_folder, exist_ok=True)
 
@@ -58,8 +73,7 @@ for filename in os.listdir(image_folder):
                             If vertical mullions are visible on the upper floors but NOT on the ground floor, this **MUST** be explicitly stated in the prompt. Use phrases like: “uninterrupted transparent glazing at base” and “distinct visual transition.”
 
                             Begin.
-
-                                    """
+                                """
                             },
                             {
                                 "type": "image_url",
@@ -76,11 +90,36 @@ for filename in os.listdir(image_folder):
             prompt = response.choices[0].message.content
 
             if prompt is not None:
+                # Save the prompt as text file
                 output_path = os.path.join(output_folder, filename + ".txt")
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(prompt)
 
                 print(f"Saved description to {output_path}\n")
+
+                # Now update corresponding JSON file
+                number_str = filename.split('_')[1].split('.')[0]  # e.g., '0001'
+                image_num = int(number_str) - 1  # convert to 0-based index for tower folders
+
+                tower_folder = f"GeometryImagesRhino/tower_{image_num:03d}"
+                json_path = os.path.join(tower_folder, "params.json")
+                output_json_path = os.path.join(tower_folder, output_json_name)
+
+                if os.path.exists(json_path):
+                    with open(json_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+
+                    # Replace the prompt
+                    data["tower_info"]["prompt"] = prompt
+
+                    # Save new JSON file
+                    with open(output_json_path, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=2)
+
+                    print(f"Saved updated JSON to {output_json_path}\n")
+                else:
+                    print(f"JSON file not found at {json_path}. Skipping JSON update.\n")
+
             else:
                 print(f"No response received for {filename}. Skipping.\n")
 
