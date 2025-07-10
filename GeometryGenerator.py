@@ -7,7 +7,7 @@ import shutil
 import math
 
 # --- CONFIG ---
-NUM_VARIATIONS = 100
+NUM_VARIATIONS = 5
 CELL_SIZE = 2.0
 LAYER_HEIGHT = 1.0
 MAX_BASE = 12
@@ -28,8 +28,9 @@ CAMERA_Z_FACTOR = 0.5          # Camera height as a factor of building height (0
 GRID_SPACING = (MAX_BASE * CELL_SIZE) * 1.5 # Spacing between items in the final grid
 
 # --- IMPORTANT: SET YOUR OUTPUT DIRECTORY ---
-ROOT_DIR = "/Users/andreivince/Desktop/architecture-ai-engine/images_CA_Andrei"
-os.makedirs(ROOT_DIR, exist_ok=True)
+ROOT_DIR = "C:\\Users\\aidan\\Documents\\School\\Research\\repos\\architecture-ai-engine\\images_CA_Aidan"
+if not os.path.exists(ROOT_DIR):
+    os.makedirs(ROOT_DIR)
 
 
 def compute_next(g, b, smin, smax):
@@ -82,15 +83,15 @@ def setup_angled_perspective_view(target_point, camera_distance, building_height
 def capture_view(filepath):
     """Captures the current view to a file in Shaded mode."""
     rs.UnselectAllObjects()
-    rs.Command("_-SetDisplayMode Mode=Shaded _Enter", False)
+    rs.Command("_-SetDisplayMode _Shaded _Enter", False)
     
     command = (
-        f"-_ViewCaptureToFile \"{filepath}\" "
+        '-_ViewCaptureToFile "{}" '
         "Width=1024 Height=1024 "
         "LockAspectRatio=No "
         "TransparentBackground=Yes "
         "_Enter"
-    )
+    ).format(filepath)
     rs.Command(command, False)
     time.sleep(0.1)
 
@@ -102,7 +103,7 @@ grid_cols = int(math.ceil(NUM_VARIATIONS**0.5))
 all_tower_layers = []
 
 for idx in range(NUM_VARIATIONS):
-    layer_name = f"T{idx}"
+    layer_name = "T{idx}"
     if rs.IsLayer(layer_name): rs.PurgeLayer(layer_name)
     rs.AddLayer(layer_name)
     all_tower_layers.append(layer_name)
@@ -143,7 +144,7 @@ for idx in range(NUM_VARIATIONS):
         actual_layers_created=z+1
 
     if not building_objs:
-        print(f"Tower {idx:03d} resulted in no geometry. Skipping."); continue
+        print("Tower {idx:03d} resulted in no geometry. Skipping."); continue
 
     rs.ObjectLayer(building_objs, layer_name)
     
@@ -160,7 +161,9 @@ for idx in range(NUM_VARIATIONS):
     if ground_plane:
         rs.MoveObject(ground_plane, (-ground_plane_size/2.0, -ground_plane_size/2.0, 0))
     
-    tower_dir = os.path.join(ROOT_DIR, f"tower_{idx:03d}"); os.makedirs(tower_dir, exist_ok=True)
+    tower_dir = os.path.join(ROOT_DIR, "tower_%03d" % idx)
+    if not os.path.exists(tower_dir):
+        os.makedirs(tower_dir)
 
     tower_bbox_at_origin = rs.BoundingBox(building_objs)
     if tower_bbox_at_origin:
@@ -205,11 +208,11 @@ for idx in range(NUM_VARIATIONS):
     dot = rs.AddTextDot(layer_name, grid_position)
     if dot: rs.ObjectLayer(dot, layer_name)
 
-    print(f"Generated, captured, and placed tower {idx:03d} on layer '{layer_name}'")
+    print("Generated, captured, and placed tower {idx:03d} on layer '{layer_name}'")
 
 rs.Command("_-Zoom _Extents", False)
 rs.EnableRedraw(True)
 
-print(f"\nProcess complete. Generated {NUM_VARIATIONS} towers in {ROOT_DIR}")
+print("\nProcess complete. Generated {NUM_VARIATIONS} towers in {ROOT_DIR}")
 print("The Rhino scene now contains all variations arranged in a grid.")
 print("You may now save the .3dm file.")

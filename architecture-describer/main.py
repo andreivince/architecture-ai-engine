@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # === CONFIGURATION ===
 # Set this to "glass" or "material" before running each batch
-focus_mode = "material"  # or "material"
+focus_mode = "glass"  # or "material"
 
 # Load API key
 load_dotenv()
@@ -47,30 +47,39 @@ for filename in os.listdir(image_folder):
                             {
                                 "type": "text",
                                 "text": """
-                            You are a prompt engineer trained to extract architectural instructions from real images for use in image generation models. Your task is to observe the building and output a single paragraph prompt that causes a model like DALL·E, Midjourney, or SDXL to recreate it with maximum visual fidelity.
-
                             You must:
 
-                            1. Describe only what is visible — do not assume or invent.
-                            2. Use strict architectural terminology: façade, modules, mullions, spandrels, massing, glazing, rhythm.
-                            3. For each element, **quantify with precision**. Include:
-                            - Number of visible floors.
-                            - Estimated height of ground floor vs others.
-                            - Number of horizontal bays and vertical subdivisions per floor.
-                            - Mullion thickness in cm if discernible.
-                            - Presence or absence of spandrels or floor breaks.
-                            - Whether any floor is clearly different from others (material, height, transparency).
-                            4. Describe ground floor separately with emphasis:
-                            - If it's double-height, say so explicitly.
-                            - If it uses **larger uninterrupted glass panels**, emphasize: “NO vertical mullions or divisions on ground floor glazing.”
-                            - Mention warm lighting, interior visibility, and volumetric distinction.
-                            5. State clearly: “The ground floor MUST appear taller, with smooth, mullion-free glass different from the upper grid pattern.”
-                            6. DO NOT assume the model will understand hierarchy — you must make contrasts explicit.
-                            7. Final prompt must be one precise paragraph with all of the above baked in. No fluff. No soft words. Absolute clarity.
+                                1. Describe only the visible geometry — avoid assumptions about materials, lighting, or environment.
 
-                            Your output must force the AI to **treat the base, grid, and massing differently** — or the generation will fail.
-                            
-                            If vertical mullions are visible on the upper floors but NOT on the ground floor, this **MUST** be explicitly stated in the prompt. Use phrases like: “uninterrupted transparent glazing at base” and “distinct visual transition.”
+                                2. Use strict architectural vocabulary: massing, voids, modules, volumetric stacking, cantilevers, setbacks, grids, and hierarchical forms.
+
+                                3. Focus on spatial composition:
+
+                                    - Quantify floor count and any volumetric hierarchy.
+
+                                    - Describe presence and placement of voids, cut-outs, or recesses in the massing.
+
+                                    - State the number and rhythm of grid subdivisions across each elevation.
+
+                                    - Call out projecting, recessed, or floating elements.
+
+                                4. Emphasize voids and negative space:
+
+                                    - If large cutouts penetrate through the form, state: “rectilinear void interrupts the massing across [X] floors.”
+
+                                    - For recessed terraces or frame-like voids, note their dimensions and positions explicitly.
+
+                                5. Describe the ground floor as a distinct layer:
+
+                                    - Mention if it's recessed, elevated, or set apart volumetrically.
+
+                                    - If it features a continuous transparent base, write: “unbroken base with no vertical subdivision contrasts sharply with upper grid.”
+
+                                6. Avoid any reference to materials, reflections, weather, or vegetation — focus on formal logic only.
+
+                                7. Your final output must be a single structured paragraph, using direct, technical language to encode architectural relationships and form.
+
+                                You must force the AI to understand volumetric articulation, void-based design logic, and rhythmic composition — without relying on surface or setting.
 
                             Begin.
                                 """
@@ -114,7 +123,7 @@ for filename in os.listdir(image_folder):
 
                     # Save new JSON file
                     with open(output_json_path, "w", encoding="utf-8") as f:
-                        json.dump(data, f, indent=2)
+                        json.dump(data, f, indent=2, ensure_ascii=False)
 
                     print(f"Saved updated JSON to {output_json_path}\n")
                 else:
