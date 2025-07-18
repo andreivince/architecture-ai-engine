@@ -7,7 +7,7 @@ import shutil
 import math
 
 # --- CONFIG ---
-NUM_VARIATIONS = 100
+NUM_VARIATIONS = 10
 CELL_SIZE = 2.0
 LAYER_HEIGHT = 1.0
 MAX_BASE = 12
@@ -23,6 +23,7 @@ CAMERA_DISTANCE_MULTIPLIER = 2.7
 CAMERA_HORIZONTAL_ANGLE_DEG = 35.0
 CAMERA_TARGET_Z_FACTOR = 0.5
 CAMERA_Z_FACTOR = 0.5
+
 
 # --- Grid layout configuration ---
 GRID_SPACING = (MAX_BASE * CELL_SIZE) * 1.5
@@ -85,17 +86,17 @@ def get_bounding_box_center_coords(bbox_points):
             (min_pt[1] + max_pt[1]) / 2.0,
             (min_pt[2] + max_pt[2]) / 2.0)
 
-def setup_angled_perspective_view(target_point, camera_distance, building_height, lens_length, 
+def setup_angled_perspective_view(target_point, camera_distance, building_height, lens_length,
                                   target_z_factor, camera_z_factor, horizontal_angle_deg):
     angle_rad = math.radians(horizontal_angle_deg)
     direction_xy = (-math.cos(angle_rad), -math.sin(angle_rad))
 
     cam_x = target_point[0] + direction_xy[0] * camera_distance
     cam_y = target_point[1] + direction_xy[1] * camera_distance
-    
+
     target_z = building_height * target_z_factor
     camera_z = building_height * camera_z_factor
-    
+
     camera_location = (cam_x, cam_y, camera_z)
     target_location = list(target_point)
     target_location[2] = target_z
@@ -109,8 +110,8 @@ def capture_view(filepath):
     rs.Command("_-SetDisplayMode _Shaded _Enter", True)
     command = (
         '-_ViewCaptureToFile "{}" '
-        "Width=1024 Height=1024 "
-        "LockAspectRatio=No "
+        "Width=800 Height=1200 "
+        "LockAspectRatio=Yes "
         "TransparentBackground=No "
         "_Enter"
     ).format(filepath)
@@ -129,7 +130,7 @@ for idx in range(NUM_VARIATIONS):
     if rs.IsLayer(layer_name): rs.PurgeLayer(layer_name)
     rs.AddLayer(layer_name)
     all_tower_layers.append(layer_name)
-    
+
     cell_centers = []
     current_seed = 42 + idx
 
@@ -143,7 +144,7 @@ for idx in range(NUM_VARIATIONS):
     yc = random.randint(3, 4)
 
 
-    min_height_ratio = 4 
+    min_height_ratio = 4
     min_layers = int(min_height_ratio * max(xc, yc))
     layers = random.randint(min_layers, MAX_LAYERS)
 
@@ -151,7 +152,7 @@ for idx in range(NUM_VARIATIONS):
     grid = [[random.choice([0, 1]) for _ in range(yc)] for _ in range(xc)]
     while sum(map(sum, grid)) < 0.5 * xc * yc:
         grid = [[random.choice([0, 1]) for _ in range(yc)] for _ in range(xc)]
-            
+
     vox, building_objs = 0, []
     actual_layers_created = 0
     taper_interval = 7
@@ -184,17 +185,17 @@ for idx in range(NUM_VARIATIONS):
             actual_layers_created = z + 1
             break
 
-        prev_grid = [row[:] for row in grid] 
+        prev_grid = [row[:] for row in grid]
         grid = compute_next(grid, prev_grid, b, smin, smax, z)
-        
+
         taper_interval = 6
         if (z + 1) % taper_interval == 0 and len(grid) > 3 and len(grid[0]) > 3:
             grid = [row[1:-1] for row in grid[1:-1]]
-        
+
         if not any(map(sum, grid)):
             if len(grid) > 3 and len(grid[0]) > 3:
-                grid = [[1 if 1 < i < len(grid)-2 and 1 < j < len(grid[0])-2 else 0 
-                        for j in range(len(grid[0]))] 
+                grid = [[1 if 1 < i < len(grid)-2 and 1 < j < len(grid[0])-2 else 0
+                        for j in range(len(grid[0]))]
                         for i in range(len(grid))]
             else:
                 break
@@ -239,28 +240,21 @@ for idx in range(NUM_VARIATIONS):
             building_height = tower_bbox_at_origin[6][2] - tower_bbox_at_origin[0][2]
             building_width = tower_bbox_at_origin[6][0] - tower_bbox_at_origin[0][0]
             building_depth = tower_bbox_at_origin[6][1] - tower_bbox_at_origin[0][1]
-            margin_factor = 0.2
-            margin_width = building_width * margin_factor
-            margin_depth = building_depth * margin_factor
-            margin_height = building_height * margin_factor
             largest_dim = max(building_width, building_depth, building_height)
-            horizontal_extent = max(building_width, building_depth) + margin_width
-            cam_dist = horizontal_extent * 1.7
-
-
+            
+            # --- MODIFIED CAMERA DISTANCE ---
+            cam_dist = largest_dim * CAMERA_DISTANCE_MULTIPLIER
 
             setup_angled_perspective_view(
-                target_coords, 
-                cam_dist, 
-                building_height, 
+                target_coords,
+                cam_dist,
+                building_height,
                 50,
                 CAMERA_TARGET_Z_FACTOR,
                 CAMERA_Z_FACTOR,
                 CAMERA_HORIZONTAL_ANGLE_DEG
             )
 
-            rs.SelectObjects(building_objs)
-            rs.Command("_-Zoom _Selected _Enter", False)
             
             filepath = os.path.join(tower_dir, "perspective.png")
             capture_view(filepath)
